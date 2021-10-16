@@ -11,6 +11,9 @@ class Settings(BaseSettings):
 
     origins: List[str]
 
+    algorithm: str
+    secret_key: str
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
