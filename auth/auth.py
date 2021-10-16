@@ -24,6 +24,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/login")
 
 
 """ curl -X POST http://127.0.0.1:8000/v1/login -F "username=testadmin" -F "password=qwerty12345" """
+
+
 @router.post("/v1/login")
 async def get_auth_data(
     request: Request,
@@ -73,7 +75,7 @@ def create_token(
     return encoded_jwt
 
 
-async def login(user, settings, response):
+async def login(user, response):
     if not user:
         raise HTTPException(
             status_code=401,

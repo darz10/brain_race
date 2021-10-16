@@ -1,7 +1,13 @@
 from asyncpg import create_pool
+
+import aioredis
 from settings import settings
 
 pool = None
+
+
+async def connect_redis():
+    return await aioredis.from_url(settings.redis_conn)
 
 
 async def get_asyncpg_pool():
@@ -17,7 +23,7 @@ async def get_user(username: str):
     async with db.acquire() as c:
         return await c.fetchrow(
             """
-            SELECT user_id, first_name, second_name, hashed_password, email, role_id, disabled
+            SELECT username, user_id, first_name, second_name, hashed_password, email, role_id, disabled
             FROM users
             WHERE username = $1
             """,
@@ -26,29 +32,25 @@ async def get_user(username: str):
 
 
 async def add_new_user(
+    username: str,
     first_name: str,
     second_name: str,
-    username: str,
     password: str,
     email: str,
-    role_id: int,
-    disabled: bool,
 ):
     """Добавление нового пользователя в бд"""
     db = await get_asyncpg_pool()
     async with db.acquire() as c:
         await c.execute(
             """
-            INSERT INTO users(username, first_name, second_name, hashed_password, email, role_id, disabled) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO users(username, first_name, second_name, hashed_password, email) 
+            VALUES ($1, $2, $3, $4, $5)
             """,
             username,
             first_name,
             second_name,
             password,
             email,
-            role_id,
-            disabled,
         )
 
 
