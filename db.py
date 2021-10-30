@@ -1,13 +1,8 @@
 from asyncpg import create_pool
 
-import aioredis
 from settings import settings
 
 pool = None
-
-
-async def connect_redis():
-    return await aioredis.from_url(settings.redis_conn)
 
 
 async def get_asyncpg_pool():
@@ -77,4 +72,51 @@ async def update_user(
             password,
             email,
             user_id,
+        )
+
+
+async def get_user(username: str):
+    """Получение данных о пользователе"""
+    db = await get_asyncpg_pool()
+    async with db.acquire() as c:
+        return await c.fetchrow(
+            """
+            SELECT username, user_id, first_name, second_name, hashed_password, email, role_id, disabled
+            FROM users
+            WHERE username = $1
+            """,
+            username,
+        )
+
+
+async def game_user_data(username: str):
+    """Получение игровых данных о пользователе"""
+    db = await get_asyncpg_pool()
+    async with db.acquire() as c:
+        return await c.fetchrow(
+            """
+            SELECT username, user_id, first_name, second_name, hashed_password, email, role_id, disabled
+            FROM users
+            WHERE username = $1
+            """,
+            username,
+        )
+
+
+async def get_user_cars(username: str):
+    """Получение всех машин пользователя по его username"""
+    db = await get_asyncpg_pool()
+    async with db.acquire() as c:
+        return await c.fetchrow(
+            """
+            SELECT c.car_name, c.description, color_name, model_name
+            FROM user_to_car utc
+            INNER JOIN car c ON c.id = utc.car_id
+            INNER JOIN car_to_color ctc ON ctc.color_id = c.id
+            INNER JOIN color ON color.color_id = ctc.color_id
+            INNER JOIN model m ON c.model_id = m.model_id
+            INNER JOIN users u ON u.user_id = utc.user_id
+            WHERE u.username = $1
+            """,
+            username,
         )

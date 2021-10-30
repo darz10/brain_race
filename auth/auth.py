@@ -33,7 +33,7 @@ async def get_auth_data(
     user_data: OAuth2PasswordRequestForm = Depends(),
 ) -> Token:
     user = await auth_user(user_data.username, user_data.password)
-    return await login(user, settings, response)
+    return await login(user, response)
 
 
 async def get_user(username: str) -> UserInDB:
