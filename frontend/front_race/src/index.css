@@ -1,0 +1,41 @@
+body::before {
+  content: '';
+  position: fixed; /* Фиксируем на одном месте */
+  left: 0; right: 0; /* Вся ширин */
+  top: 0; bottom: 0; /* Вся высота */
+  z-index: -1; /* Фон ниже текста */
+  /* Параметры фона */
+  background: url(./race.jpg) center / cover no-repeat;
+  filter: blur(5px); /* Размытие */
+ }
+
+body {
+  background:url(./race.jpg) no-repeat; 
+  background-size: cover;
+  backdrop-filter: blur(100px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.block_login {
+  margin-top: 40%;
+  margin-bottom: 35%;
+  background:rgba(218, 219, 238, 0.589); 
+  min-width: 100vh - 150px;
+  min-height: 100vh - 150px;
+  width: 50vh; 
+  height: 60vh; 
+  position: relative; 
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+path {
+  fill: none;
+  stroke-width: 4;
+  stroke-dasharray: 240 1386;
+}

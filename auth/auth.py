@@ -9,7 +9,7 @@ from jose import jwt, JWTError
 from auth.get_hash_password import (
     verify_password,
 )
-from auth.schemas import Token, UserInDB
+from auth.schemas import Token, UserInDB, UserLogin
 from settings import settings
 import db
 
@@ -30,9 +30,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/login")
 async def get_auth_data(
     request: Request,
     response: Response,
-    user_data: OAuth2PasswordRequestForm = Depends(),
+    user: UserLogin,
 ) -> Token:
-    user = await auth_user(user_data.username, user_data.password)
+    user = await auth_user(user.username, user.password)
     return await login(user, response)
 
 
@@ -48,6 +48,8 @@ async def get_user(username: str) -> UserInDB:
             email=user_data["email"],
             role_id=user_data["role_id"],
             disabled=user_data["disabled"],
+            user_level=user_data["user_level"],
+            current_car_id=user_data["current_car_id"]
         )
 
 

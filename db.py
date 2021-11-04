@@ -1,8 +1,12 @@
 from asyncpg import create_pool
+import aioredis
 
 from settings import settings
 
 pool = None
+
+async def get_redis_conn():
+    return await aioredis.create_redis(settings.redis_conn)
 
 
 async def get_asyncpg_pool():
@@ -81,7 +85,7 @@ async def get_user(username: str):
     async with db.acquire() as c:
         return await c.fetchrow(
             """
-            SELECT username, user_id, first_name, second_name, hashed_password, email, role_id, disabled
+            SELECT username, user_id, first_name, second_name, hashed_password, email, role_id, disabled, user_level, current_car_id
             FROM users
             WHERE username = $1
             """,
@@ -95,7 +99,16 @@ async def game_user_data(username: str):
     async with db.acquire() as c:
         return await c.fetchrow(
             """
-            SELECT username, user_id, first_name, second_name, hashed_password, email, role_id, disabled
+            SELECT username, 
+            user_id, 
+            first_name, 
+            second_name, 
+            hashed_password, 
+            email, 
+            role_id, 
+            disabled, 
+            current_car_id,
+            user_level 
             FROM users
             WHERE username = $1
             """,
@@ -103,13 +116,38 @@ async def game_user_data(username: str):
         )
 
 
+async def update_user_level(level: int, username: str):
+    """Обновить уровень игрока"""
+    db = await get_asyncpg_pool()
+    async with db.acquire() as c:
+        return await c.execute(
+            """
+            UPDATE users 
+            SET user_level = $1
+            WHERE username = $2
+            """,
+            level,
+            username,
+        )
+
+
+
 async def get_user_cars(username: str):
     """Получение всех машин пользователя по его username"""
     db = await get_asyncpg_pool()
     async with db.acquire() as c:
-        return await c.fetchrow(
+        return await c.fetch(
             """
-            SELECT c.car_name, c.description, color_name, model_name
+            SELECT DISTINCT c.id as car_id, c.car_name, c.description, 
+            ARRAY(
+                SELECT DISTINCT color_name 
+				from user_to_car utc
+            	INNER JOIN car c ON c.id = utc.car_id
+				INNER JOIN car_to_color ctc ON ctc.color_id = c.id
+				INNER JOIN color ON color.color_id = ctc.color_id
+				where username = $1
+                ) as color_name,
+            model_name
             FROM user_to_car utc
             INNER JOIN car c ON c.id = utc.car_id
             INNER JOIN car_to_color ctc ON ctc.color_id = c.id
