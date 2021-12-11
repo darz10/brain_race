@@ -1,12 +1,14 @@
 from asyncio import get_event_loop
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
-from db import get_asyncpg_pool
+from db import BrainRaceDB
 from auth import auth, reg_user
 from race import views
 from settings import settings
 
 app = FastAPI()
+
+db = BrainRaceDB(settings.psql_conn)
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,7 +23,7 @@ app.add_middleware(
 async def startup():
     app.state.settings = settings
     app.state.loop = get_event_loop()
-    app.state.db = await get_asyncpg_pool()
+    app.state.db = await db.get_asyncpg_pool()
 
 
 app.include_router(auth.router)

@@ -19,7 +19,7 @@ class User(BaseModel):
 
 class UserInDB(User):
     hashed_password: str
-    currnet_car_id: int
+    current_car_id: int
     user_level: int
 
 

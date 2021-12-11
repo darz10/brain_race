@@ -1,3 +1,12 @@
+*, *:after, *:before {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  transition: .5s ease-in-out;
+  /* добавим плавность переходов для всех элементов страницы*/
+}
+
+
 body::before {
   content: '';
   position: fixed; /* Фиксируем на одном месте */
@@ -32,6 +41,63 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.form_auth{
+  margin-left: 10%;
+  margin-right: 10%;
+  width: 130%;
+}
+
+.username{
+  font-size: larger;
+  outline: 0;
+  border-width: 0 0 3px;
+  border-color: rgb(85, 0, 134);
+  margin: 15px;
+  width: 90%;
+  height: 120%;
+  background: rgba(218, 219, 238, 0.0001);
+  text-align: center;
+}
+
+.username:focus{
+  border-color: #3498db;
+}
+
+.password{
+  font-size: larger;
+  margin: 15px;
+  width: 90%;
+  height: 120%;
+  outline: 0;
+  border-width: 0 0 3px;
+  border-color: rgb(85, 0, 134);
+  background: rgba(218, 219, 238, 0.0001);
+  text-align: center;
+}
+
+.password:focus{
+  border-color: #3498db;
+}
+
+.button_auth{
+  font-size: larger;
+  width: 90%;
+  height: 50px;
+  border-color: #3498db;
+  color: #fff;
+  box-shadow: 0 0 40px 40px #3498db inset, 0 0 0 0 #3498db;
+  transition: all 150ms ease-in-out;
+  margin: 15px;
+
+}
+
+.button_auth:hover {
+  box-shadow: 0 0 10px 0 rgb(6, 162, 209) inset, 0 0 10px 4px rgb(6, 162, 209);
+  border-radius: 20px;
+  color: black;
+  background: white;
 }
 
 path {

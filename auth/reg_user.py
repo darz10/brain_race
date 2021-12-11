@@ -4,18 +4,18 @@ from auth.get_hash_password import get_password_hash
 from auth.auth import get_current_user
 from auth.schemas import CreateUser, ResponseUser, UpdatedUser, User
 from settings import settings
-import db
+from db import BrainRaceDB
 
 
 router = APIRouter()
 
 
-@router.post("/v1/create_user", response_class=ResponseUser)
+@router.post("/v1/create-user")
 async def add_new_user(request: Request, user: CreateUser):
     """Создание нового пользователя"""
     try:
         # //TODO создать проверку на максимальное создание аккаунтов 5 шт.
-        await db.add_new_user(
+        await BrainRaceDB.add_new_user(
             user.username,
             user.first_name,
             user.second_name,
@@ -27,7 +27,7 @@ async def add_new_user(request: Request, user: CreateUser):
         raise HTTPException(status_code=400, detail=f"{e}")
 
 
-@router.post("/v1/update_user", response_class=ResponseUser)
+@router.post("/v1/update-user")
 async def update_user(
     request: Request,
     user: UpdatedUser,
@@ -36,7 +36,7 @@ async def update_user(
     """Изменение информации о пользователе
     curl -X POST http://127.0.0.1:8000/v1/update_user -H '{"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW4iLCJ1c2VyX2lkIjoxLCJleHAiOjE3OTE3NzQ3MzR9.-CH0HOoZxmUPCGUfHxG1SxHtk7WyrPdElShoobQwguE"}' -d '{"user_id": 2, "first_name": "Kirill", "email": "qwerty@qwe.ru"}'"""
     try:
-        await db.update_user(
+        await BrainRaceDB.update_user(
             user.user_id,
             user.first_name,
             user.second_name,

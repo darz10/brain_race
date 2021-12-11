@@ -7,12 +7,16 @@ class ResponseStatus(BaseModel):
     status_code: int
     resposne: Optional[str] = None
 
+class UpdCar(BaseModel):
+    car_id: int
+
 
 class Car(BaseModel):
     car_name: str
-    description: str
     color_name: List[str] 
     model_name: str
+    description: str
+
 
 
 class UserCars(BaseModel):

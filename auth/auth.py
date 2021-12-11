@@ -2,7 +2,7 @@ import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Request, HTTPException, Depends, Response
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.oauth2 import SecurityScopes
 from pydantic import ValidationError
 from jose import jwt, JWTError
@@ -11,10 +11,12 @@ from auth.get_hash_password import (
 )
 from auth.schemas import Token, UserInDB, UserLogin
 from settings import settings
-import db
+from db import BrainRaceDB
 
 
 router = APIRouter()
+
+db = BrainRaceDB(settings.psql_conn)
 
 ACCESS_TOKEN_EXPIRE_DAYS = 365 * 5
 SECRET_KEY = settings.secret_key
@@ -24,8 +26,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/login")
 
 
 """ curl -X POST http://127.0.0.1:8000/v1/login -F "username=testadmin" -F "password=qwerty12345" """
-
-
 @router.post("/v1/login")
 async def get_auth_data(
     request: Request,
@@ -37,7 +37,7 @@ async def get_auth_data(
 
 
 async def get_user(username: str) -> UserInDB:
-    user_data = await db.get_user(username)
+    user_data = await db.get_user(username=username)
     if user_data:
         return UserInDB(
             username=username,
@@ -91,7 +91,7 @@ async def login(user, response):
         secret_key=SECRET_KEY,
     )
     resp = {"access_token": access_token, "token_type": "bearer"}
-    response.headers["authorization"] = access_token
+    response.headers["authorization"] = "Bearer " + access_token
 
     return resp
 

@@ -1,12 +1,12 @@
 // import './style.css';
-import { Row, Form, Input, Button, Checkbox } from 'antd';
 // import "../index.css"
 
 
-const onFinish = (values) => {
+const handleSubmit = (values) => {
+  console.log(values);
   fetch(`http://127.0.0.1:8000/v1/login`, {
     headers: {
-      'Content-Type': 'multipart/form-data;',
+      'Content-Type': 'application/json;',
       'Access-Control-Allow-Origin': '*',
       'Accept-Encoding': 'gzip, deflate, br',
       'Connection': 'keep-alive',
@@ -14,7 +14,7 @@ const onFinish = (values) => {
     },
     credentials: 'same-origin',
     method: 'POST',
-    body: JSON.stringify({'username': values.username, '  password': values.password})
+    body: JSON.stringify({'username': values.username, 'password': values.password})
   }).then(response => {});
 };
 
@@ -24,73 +24,22 @@ const onFinishFailed = (errorInfo) => {
 
 const Auth = (props) => {
 return(
-    <div class="block_login">
-      <Row justify="center" type="flex" align="middle" style={{marginTop: "20%"}}>
-        <Form
-          name="login_form"
-          labelCol={{
-            span: 8,
-          }}
-          wrapperCol={{
-            span: 16,
-          }}
-          initialValues={{
-            remember: true,
-          }}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-          autoComplete="off"
-          style={{marginLeft: "10%"}, {marginRight: "10%"}, {minHeight: "calc(100vh - 950px)"}}
-        >
-          <Form.Item
-            label="Username"
-            name="username"
-            rules={[
-              {
-                required: true,
-                message: 'Please input your username!',
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            label="Password"
-            name="password"
-            rules={[
-              {
-                required: true,
-                message: 'Please input your password!',
-              },
-            ]}
-          >
-            <Input.Password />
-          </Form.Item>
-          
-          <Form.Item
-            name="remember"
-            valuePropName="checked"
-            wrapperCol={{
-              offset: 8,
-              span: 16,
-            }}
-          >
-            <Checkbox>Remember me</Checkbox>
-          </Form.Item>
-
-          <Form.Item
-            wrapperCol={{
-              offset: 8,
-              span: 16,
-            }}
-          >
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
-        </Form>
-      </Row>
+    <div>
+      <div class="changer_form">
+        <button class="login">Login</button>
+        <button class="register">Register</button>
+      </div>
+      <div class="block_login">
+        <form class="form_auth" onSubmit={handleSubmit}>
+          <label>
+            <input type="text" class="username" placeholder="Username" required/>
+          </label>
+          <label>
+            <input type="password" class="password" placeholder="Password" required/>
+          </label>
+          <input type="submit" class="button_auth" value="Log in" />
+        </form>
+      </div>
     </div>
 )
 }
