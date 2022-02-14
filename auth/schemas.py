@@ -8,9 +8,9 @@ class Token(BaseModel):
 
 
 class User(BaseModel):
-    user_id: int
-    username: str
-    role_id: int
+    user_id: int = Field(..., description="id пользователя")
+    username: str = Field(..., description="Логин пользователя")
+    role_id: int = Field(..., description="Роль пользователя")
     email: Optional[str] = None
     first_name: Optional[str] = None
     second_name: Optional[str] = None
@@ -18,9 +18,9 @@ class User(BaseModel):
 
 
 class UserInDB(User):
-    hashed_password: str
     current_car_id: int
     user_level: int
+    hashed_password: str
 
 
 class CreateUser(BaseModel):
