@@ -20,3 +20,9 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def get_settings():
+    global settings
+    settings = Settings() if not settings else settings
+    return settings
