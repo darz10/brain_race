@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from db import BrainRaceDB
 from auth import auth, reg_user
 from race import views
+from game import views as game_views
 from settings import settings
 
 app = FastAPI()
@@ -29,11 +30,4 @@ async def startup():
 app.include_router(auth.router)
 app.include_router(reg_user.router)
 app.include_router(views.router)
-
-
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
+app.include_router(game_views.router)
