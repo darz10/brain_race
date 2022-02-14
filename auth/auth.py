@@ -3,6 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Request, HTTPException, Depends, Response
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.openapi.models import OAuthFlows  # сделать из этого oauth_scheme
 from fastapi.security.oauth2 import SecurityScopes
 from pydantic import ValidationError
 from jose import jwt, JWTError
@@ -10,7 +11,7 @@ from auth.get_hash_password import (
     verify_password,
 )
 from auth.schemas import Token, UserInDB, UserLogin
-from settings import settings
+from settings import Settings, get_settings, settings
 from db import BrainRaceDB
 
 
@@ -26,6 +27,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/login")
 
 
 """ curl -X POST http://127.0.0.1:8000/v1/login -F "username=testadmin" -F "password=qwerty12345" """
+
+
 @router.post("/v1/login")
 async def get_auth_data(
     request: Request,
@@ -49,11 +52,11 @@ async def get_user(username: str) -> UserInDB:
             role_id=user_data["role_id"],
             disabled=user_data["disabled"],
             user_level=user_data["user_level"],
-            current_car_id=user_data["current_car_id"]
+            current_car_id=user_data["current_car_id"],
         )
 
 
-async def auth_user(username: str, password: str):
+async def auth_user(username: str, password: str) -> UserInDB:
     user = await get_user(username)
     if not user:
         return False
@@ -92,14 +95,13 @@ async def login(user, response):
     )
     resp = {"access_token": access_token, "token_type": "bearer"}
     response.headers["authorization"] = "Bearer " + access_token
-
     return resp
 
 
 async def get_current_user(
     security_scopes: SecurityScopes,
     token: str = Depends(oauth2_scheme),
-    settings=settings,
+    settings: Settings = Depends(get_settings),
 ) -> UserInDB:
     if security_scopes.scopes:
         auth_value = f'Bearer scope="{security_scopes.scope_str}"'
