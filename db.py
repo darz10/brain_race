@@ -1,3 +1,4 @@
+from typing import List
 from asyncpg import create_pool
 import aioredis
 
@@ -5,12 +6,14 @@ from settings import settings
 
 pool = None
 
+
 async def get_redis_conn():
     return await aioredis.from_url(settings.redis_conn)
 
 
 class BrainRaceDB:
     """Класс отвечающий за запросы к бд"""
+
     def __init__(self, psql_conn):
         self.psql_conn = psql_conn
 
@@ -19,7 +22,6 @@ class BrainRaceDB:
         if pool is None:
             pool = await create_pool(self.psql_conn, max_size=90)
         return pool
-
 
     async def get_user(self, username: str):
         """Получение данных о пользователе"""
@@ -33,7 +35,6 @@ class BrainRaceDB:
                 """,
                 username,
             )
-
 
     async def add_new_user(
         self,
@@ -57,7 +58,6 @@ class BrainRaceDB:
                 password,
                 email,
             )
-
 
     async def update_user(
         self,
@@ -85,7 +85,6 @@ class BrainRaceDB:
                 user_id,
             )
 
-
     async def get_user(self, username: str):
         """Получение данных о пользователе"""
         db = await self.get_asyncpg_pool()
@@ -98,7 +97,6 @@ class BrainRaceDB:
                 """,
                 username,
             )
-
 
     async def game_user_data(self, username: str):
         """Получение игровых данных о пользователе"""
@@ -122,7 +120,6 @@ class BrainRaceDB:
                 username,
             )
 
-
     async def get_user_level(self, username: str):
         """Получить уровень игрока"""
         db = await self.get_asyncpg_pool()
@@ -135,7 +132,6 @@ class BrainRaceDB:
                 """,
                 username,
             )
-
 
     async def update_user_level(self, level: int, username: str):
         """Обновить уровень игрока"""
@@ -150,7 +146,6 @@ class BrainRaceDB:
                 level,
                 username,
             )
-
 
     async def get_user_cars(self, username: str):
         """Получение всех машин пользователя по его username"""
@@ -189,5 +184,23 @@ class BrainRaceDB:
                 SET user_id = $1, car_id = $2
                 """,
                 user_id,
-                car_id
+                car_id,
             )
+
+    async def get_random_question(self):
+        """Получение случайных вопросов"""
+        db = await self.get_asyncpg_pool()
+        async with db.acquire() as c:
+            return await c.fetch(
+                """
+                SELECT question, answer1, answer2, answer3, answer4, right_answer, cq.time
+                FROM poll_questions p
+                INNER JOIN  complexity_question cq ON p.category = cq.level_difficultly
+                ORDER BY RANDOM()
+                LIMIT 30
+                """,
+                # limit это количество вопросов получаемые в игре
+            )
+
+
+db = BrainRaceDB(settings.psql_conn)
